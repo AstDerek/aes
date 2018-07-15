@@ -1,4 +1,8 @@
 <?php
+namespace VKR\AES;
+
+use Exception;
+
 // Common to All
 /***
  * AES_Encryption
@@ -60,8 +64,6 @@
  * @website http://www.strategystar.net
  **/
 
-require_once './padCrypt.php';
-
 class AES_Encryption
 {
     private $key, $initVector, $mode, $cipher, $encryption = null;
@@ -92,7 +94,7 @@ class AES_Encryption
 
         if(!class_exists('padCrypt'))
         {
-            throw new Exception('The padCrypt class must be loaded for AES_Encryption to work: '.$padCrypt_url);
+            throw new Exception('The padCrypt class must be loaded for AES_Encryption to work: '.$this->padCrypt_url);
         }
 
         if(!function_exists('mcrypt_module_open'))
@@ -175,12 +177,12 @@ class AES_Encryption
 
     private function pad($text, $block_size)
     {
-        return call_user_func_array(array('padCrypt', 'pad_'.$this->allowed_paddings[$this->padding]), array($text, $block_size));
+        return call_user_func_array(['PadCrypt', 'pad_'.$this->allowed_paddings[$this->padding]], array($text, $block_size));
     }
 
     private function unpad($text)
     {
-        return call_user_func_array(array('padCrypt', 'unpad_'.$this->allowed_paddings[$this->padding]), array($text));
+        return call_user_func_array(['PadCrypt', 'unpad_'.$this->allowed_paddings[$this->padding]], array($text));
     }
 
     public function __destruct()

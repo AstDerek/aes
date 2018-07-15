@@ -1,4 +1,5 @@
 <?php
+namespace VKR\AES;
 
 /**
  * padCrypt.php
@@ -13,7 +14,7 @@
  * @website http://www.strategystar.net
  */
 
-class padCrypt
+class PadCrypt
 {
     public static function pad_ISO_10126($data, $block_size)
     {
