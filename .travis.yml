@@ -1,0 +1,19 @@
+language: php
+
+services:
+  - docker
+
+git:
+  submodules: false
+
+before_install:
+  - echo -e "machine github.com\n  login $CI_USER_TOKEN" > ~/.netrc
+  - git clone https://github.com/dentalsleepsolutions/dentalsleepsolutions.git
+  - cd dentalsleepsolutions/docker
+  - docker-compose build
+
+script:
+  - cd dentalsleepsolutions/docker
+  - docker-compose up -d
+  - ./tests.sh
+  
