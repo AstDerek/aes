@@ -14,6 +14,9 @@ before_install:
   - sed -i "s/^FILE_STORAGE/#FILE_STORAGE/g" .env
   - sed -i "s/^GITHUB_USER/#GITHUB_USER/g" .env
   - sed -i "s/^GITHUB_TOKEN/#GITHUB_TOKEN/g" .env
+  - sed -i "s/^MEDIUM_WAIT_TIME/#MEDIUM_WAIT_TIME/g" .env
+  - sed -i "s/^SHORT_WAIT_TIME/#SHORT_WAIT_TIME/g" .env
+  - sed -i "s/^VERY_SHORT_WAIT_TIME/#VERY_SHORT_WAIT_TIME/g" .env
   - docker-compose build
   - docker-compose up -d
   - docker-compose exec api php artisan passport:keys
