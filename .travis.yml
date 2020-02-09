@@ -9,6 +9,7 @@ git:
 before_install:
   - echo -e "machine github.com\n  login $CI_USER_TOKEN" > ~/.netrc
   - git clone https://github.com/dentalsleepsolutions/dentalsleepsolutions.git
+  - git checkout RC-2020-02-09
   - cd dentalsleepsolutions/docker
   - cp .env.example .env
   - sed -i "s/^FILE_STORAGE/#FILE_STORAGE/g" .env
@@ -19,11 +20,10 @@ before_install:
   - sed -i "s/^VERY_SHORT_WAIT_TIME/#VERY_SHORT_WAIT_TIME/g" .env
   - cat .env
   - docker-compose config
-  - ./fail-here.sh
   - docker-compose build
   - docker-compose up -d
   - docker-compose exec api php artisan passport:keys
 
 script:
-  - ./tests-abort-soon.sh
+  - ./tests.sh
   
