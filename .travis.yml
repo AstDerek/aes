@@ -11,6 +11,14 @@ before_install:
   - git clone https://github.com/dentalsleepsolutions/dentalsleepsolutions.git
   - cd dentalsleepsolutions
   - git checkout RC-2020-02-09
+  - yarn --cwd legacy
+  - yarn --cwd patient-reg
+  - yarn --cwd common-js
+  - yarn --cwd education
+  - yarn --cwd new-ui
+  - yarn --cwd patient-portal
+  - yarn --cwd screener-v2
+  - yarn --cwd vue
   - cd docker
   - cp .env.example .env
   - sed -i "s/^FILE_STORAGE/#FILE_STORAGE/g" .env
