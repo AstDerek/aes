@@ -32,6 +32,8 @@ workflows:
   version: 2
   build-and-run:
     jobs:
+      - docker-compose
+          context: docker
       - run-tests:
           requires:
             - docker-compose
