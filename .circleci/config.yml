@@ -1,0 +1,37 @@
+version: 2
+jobs:
+  build:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - run:
+        command: |
+          echo -e "machine github.com\n  login $CI_USER_TOKEN" > ~/.netrc
+          git clone https://github.com/dentalsleepsolutions/dentalsleepsolutions.git
+          cd dentalsleepsolutions
+          git checkout RC-2020-02-09
+          cd docker
+          cp .env.example .env
+          sed -i "s/^FILE_STORAGE/#FILE_STORAGE/g" .env
+          sed -i "s/^GITHUB_USER/#GITHUB_USER/g" .env
+          sed -i "s/^GITHUB_TOKEN/#GITHUB_TOKEN/g" .env
+          sed -i "s/^MEDIUM_WAIT_TIME/#MEDIUM_WAIT_TIME/g" .env
+          sed -i "s/^SHORT_WAIT_TIME/#SHORT_WAIT_TIME/g" .env
+          sed -i "s/^VERY_SHORT_WAIT_TIME/#VERY_SHORT_WAIT_TIME/g" .env
+          cat .env
+          docker-compose config
+          docker-compose build
+          docker-compose up -d
+          docker-compose exec api php artisan passport:keys
+  test:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - run: ./tests.sh
+workflows:
+  version: 2
+  build-and-test:
+    - test:
+      requires:
+        - build
+      context: docker
