@@ -33,6 +33,6 @@ workflows:
   build-and-test:
     jobs:
       - test:
-        requires:
-          - build
-        context: docker
+          requires:
+            - build
+          context: docker
