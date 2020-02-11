@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  docker-compose:
+  setup-env:
     machine:
       image: ubuntu-1604:201903-01
     steps:
@@ -8,9 +8,8 @@ jobs:
           command: |
             echo -e "machine github.com\n  login $GITHUB_TOKEN" > ~/.netrc
             git clone https://github.com/dentalsleepsolutions/dentalsleepsolutions.git
-            cd dentalsleepsolutions
+            cd dentalsleepsolutions/docker
             git checkout RC-2020-02-11
-            cd docker
             cp .env.example .env
             sed -i "s/^FILE_STORAGE/#FILE_STORAGE/g" .env
             sed -i "s/^GITHUB_USER/#GITHUB_USER/g" .env
@@ -18,23 +17,117 @@ jobs:
             sed -i "s/^MEDIUM_WAIT_TIME/#MEDIUM_WAIT_TIME/g" .env
             sed -i "s/^SHORT_WAIT_TIME/#SHORT_WAIT_TIME/g" .env
             sed -i "s/^VERY_SHORT_WAIT_TIME/#VERY_SHORT_WAIT_TIME/g" .env
-            cat .env
             docker-compose config
-            docker-compose build
-            docker-compose up -d
-            docker-compose exec api php artisan passport:keys
+  build-base-images:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - run:
+          command: |
+            cd dentalsleepsolutions/docker
+            docker-compose build baseimage
+            docker-compose build baseimagejs
+  build-db:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - run:
+          command: cd dentalsleepsolutions/docker && docker-compose build db
+  build-api:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - run:
+          command: cd dentalsleepsolutions/docker && docker-compose build api
+  build-loader:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - run:
+          command: cd dentalsleepsolutions/docker && docker-compose build loader
+  build-new-ui:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - run:
+          command: cd dentalsleepsolutions/docker && docker-compose build new-ui
+  build-patient-portal:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - run:
+          command: cd dentalsleepsolutions/docker && docker-compose build patient-portal
+  build-screener:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - run:
+          command: cd dentalsleepsolutions/docker && docker-compose build screener-v2
+  start-containers:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - run:
+          command: cd dentalsleepsolutions/docker && docker-compose up -d
+  setup-containers:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - run:
+          command: cd dentalsleepsolutions/docker && docker-compose exec api php artisan passport:keys
   run-tests:
     machine:
       image: ubuntu-1604:201903-01
     steps:
-      - run: ./tests.sh
+      - run: cd dentalsleepsolutions/docker && ./tests.sh
 workflows:
   version: 2
   build-and-run:
     jobs:
-      - docker-compose:
+      - setup-env:
+          context: docker
+      - build-base-images:
+          requires:
+            - setup-env
+          context: docker
+      - build-db:
+          requires:
+            - build-base-images
+          context: docker
+      - build-api:
+          requires:
+            - build-base-images
+          context: docker
+      - build-loader:
+          requires:
+            - build-base-images
+          context: docker
+      - build-new-ui:
+          requires:
+            - build-base-images
+          context: docker
+      - build-patient-portal:
+          requires:
+            - build-base-images
+          context: docker
+      - build-screener:
+          requires:
+            - build-base-images
+          context: docker
+      - start-containers:
+          requires:
+            - build-db
+            - build-api
+            - build-loader
+            - build-new-ui
+            - build-patient-portal
+            - build-screener
+          context: docker
+      - setup-containers:
+          requires:
+            - start-containers
           context: docker
       - run-tests:
           requires:
-            - docker-compose
+            - setup-containers
           context: docker
