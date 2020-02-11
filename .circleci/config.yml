@@ -9,7 +9,7 @@ jobs:
             echo -e "machine github.com\n  login $GITHUB_TOKEN" > ~/.netrc
             git clone https://github.com/dentalsleepsolutions/dentalsleepsolutions.git
             cd dentalsleepsolutions
-            git checkout RC-2020-02-09
+            git checkout RC-2020-02-11
             cd docker
             cp .env.example .env
             sed -i "s/^FILE_STORAGE/#FILE_STORAGE/g" .env
