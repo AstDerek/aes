@@ -17,13 +17,15 @@ jobs:
             sed -i "s/^MEDIUM_WAIT_TIME/#MEDIUM_WAIT_TIME/g" .env
             sed -i "s/^SHORT_WAIT_TIME/#SHORT_WAIT_TIME/g" .env
             sed -i "s/^VERY_SHORT_WAIT_TIME/#VERY_SHORT_WAIT_TIME/g" .env
-            docker-compose config
   build-base-images:
     machine:
       image: ubuntu-1604:201903-01
     steps:
       - run:
           command: |
+            ls -lah
+            whoami
+            cwd
             cd dentalsleepsolutions/docker
             docker-compose build baseimage
             docker-compose build baseimagejs
